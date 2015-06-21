@@ -1,0 +1,148 @@
+---
+title       : Shiny Calorie Calculator
+framework   : revealjs        # {io2012, html5slides, shower, dzslides, ...}
+highlighter : highlight.js  # {highlight.js, prettify, highlight}
+hitheme     : tomorrow_night      # 
+widgets     : [mathjax]            # {mathjax, quiz, bootstrap}
+mode        : selfcontained # {standalone, draft}
+---
+
+## Shiny Calorie Calculator
+
+#### An application that helps you choose a diet plan
+
+Zdravka Cankova
+
+--- 
+
+## Why Count Calories?
+
+One of the most effective ways to lose weight and maintain it
+at a healthy level is to follow one simple rule: burn more energy
+than you consume. This calorie counter determines how much energy
+you burn each day (TDEE), and then helps you set goals for dietary
+calories you need to consume to regulate your weight.  
+
+The goals are based on three diet plans:  
+
+1. The first diet plan uses a daily caloric deficit (calories
+consumed - calories burned) of 500 calories, resulting in 
+approximately 1 lb lost per week.  
+
+2. The second diet plan uses a daily caloric deficit of 1000
+calories, resulting in approximately 2 lbs lost per week.  
+
+3. The third diet plan uses a daily caloric deficit calculated
+as 20% of TDEE.
+
+The third diet plan is recommended, since its daily calorie 
+allowance is easily manageable and is thought to maximize 
+fat loss while minimizing muscle loss.
+
+--- 
+
+## Calculating Calories Burned
+
+Below is an example calculation of the TDEE, as well as
+dietary calorie consumption recommendations for all 3 diet
+plans. The TDEE function has the format:    
+
+TDEE(units, gender, age, height, weight, activity)   
+
+See slide 5 github links for the complete function code. 
+
+```{r, echo = FALSE}
+TDEE <- function(units, gender, age, height, weight, activity) {
+      if(units == "1"){
+            genderless_BMR <- (10 * weight * 0.453592) + (6.25 * height * 2.54) - (5 * age)
+      }
+      else if(units == "2") {
+            genderless_BMR <- (10 * weight) + (6.25 * height) - (5 * age)
+      }
+      else {stop("Please select units.")}
+         
+      if(gender == "male") {BMR <- genderless_BMR + 5}
+      else if(gender == "female") {BMR <- genderless_BMR - 161}
+      else {stop("Please select a gender.")}
+      
+      if(activity == "sedentary") {TDEE <- round(BMR * 1.2)}
+      else if(activity == "light") {TDEE <- round(BMR * 1.375)}
+      else if(activity == "moderate") {TDEE <- round(BMR * 1.55)}
+      else if(activity == "very active") {TDEE <- round(BMR * 1.725)}
+      else if(activity == "extra active") {TDEE <- round(BMR * 1.9)}
+      else {stop("Please select activity level.")}
+}
+
+TDEE_range <- TDEE("1", "female", 30, 65, 50:500, "light")
+```
+
+```{r}
+TDEE <- TDEE("1", "female", 30, 65, 160, "light")
+# units = "1" selects US units (inches for height and lbs for weight)
+TDEE                    # calories burned
+TDEE - 500              # first diet calorie allowance
+TDEE - 1000             # second diet calorie allowance
+round(0.80 * TDEE)      # third diet calorie allowance
+```
+
+---
+
+## Comparing Diet Plans
+
+Lastly, the calorie calculator displays an interactive chart that 
+allows you to compare the calorie intake for different diet plans 
+based on weight. The plot generated for the data in the previous
+slide is shown below (see repository linked on slide 5 for
+code used):
+
+```{r, echo = FALSE, results = 'asis'}
+Lose1lb = TDEE_range - 500
+Lose2lb = TDEE_range - 1000
+IdealDeficit = round(TDEE_range * 0.80)
+cal_vs_weight <- data.frame(Weight = 50:500,
+                            "Maintenance" = TDEE_range,
+                            "Diet 1" = Lose1lb,
+                            "Diet 2" = Lose2lb,
+                            "Diet 3" = IdealDeficit,
+                            check.names = FALSE)
+
+Chart <- gvisAreaChart(cal_vs_weight,
+                      xvar = "Weight",
+                      yvar = c("Maintenance",
+                               "Diet 1",
+                               "Diet 2",
+                               "Diet 3"),
+                      options = list(height = 400,
+                                     width = 900,
+                                     chartArea = "{width: '75%'}",
+                                     vAxes = "[{title:'Calories',
+                                     format:'#,###',
+                                     textPosition: 'out'}]",
+                                     hAxes = "[{title:'Weight',
+                                     textPosition: 'out'}]",
+                                     legend = "{position: 'top'}",
+                                     areaOpacity = 0.3,
+                                     focusTarget = 'category'))
+
+print(Chart, "chart")
+```
+
+---
+
+## Links
+
+Link to the Shiny Calorie Calculator:  
+https://z-cankova.shinyapps.io/calorie_calculator
+
+Link to Github repository containing source files for the app and this
+presentation:  
+https://github.com/z-cankova/DevelopingDataProductsPA
+
+Links used to obtain information about calculating TDEE:  
+http://www.calculator.net/calorie-calculator.html  
+http://www.freedieting.com/calorie_needs.html  
+http://www.bmi-calculator.net/bmr-calculator/harris-benedict-equation/  
+
+Links used to obtain diet plan information:  
+http://www.acaloriecounter.com/diet/how-many-calories-should-i-eat-per-day-to-lose-weight/  
+http://www.acaloriecounter.com/diet/calorie-deficit-to-lose-weight/  

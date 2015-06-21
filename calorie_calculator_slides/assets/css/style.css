@@ -1,0 +1,32 @@
+#slide-2 p {
+  font-size: 30px;
+  text-align: left;
+}
+
+#slide-2 ol {
+  font-size: 30px;
+}
+
+#slide-3 p {
+  font-size: 24px;
+  text-align: left;
+}
+
+#slide-3 code {
+  background: transparent;
+}
+
+#slide-4 p {
+  font-size: 24px;
+  text-align: left;
+}
+
+#slide-5 p {
+  font-size: 30px;
+  text-align: left;
+}
+
+#slide-5 a {
+  font-size: 24px;
+  text-align: left;
+}
